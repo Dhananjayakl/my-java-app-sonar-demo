@@ -1,34 +1,54 @@
 package com.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
-
 public class UserService {
 
-    // 🔴 ISSUE 8: Hardcoded credentials (Critical Security)
-    private String dbUrl = "jdbc:mysql://localhost/mydb";
-    private String dbUser = "root";
-    private String dbPass = "root1234";
+    // 🔴 ISSUE 8: Public field instead of private with getter (Code Smell)
+    public String username;
 
-    public String username;  // 🔴 ISSUE 9: Public field (encapsulation)
-
-    // 🔴 ISSUE 10: SQL Injection vulnerability
-    public void getUser(String userId) throws Exception {
-        Connection conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
-        Statement stmt = conn.createStatement();
-        stmt.execute("SELECT * FROM users WHERE id = " + userId); // SQL Injection!
+    // 🔴 ISSUE 9: No null check before .equals() - NullPointerException risk
+    public boolean isAdmin(String role) {
+        return role.equals("ADMIN");  // throws NPE if role is null
     }
 
-    // 🔴 ISSUE 11: NullPointerException risk
-    public int getUsernameLength(String name) {
-        return name.length(); // no null check
+    // 🔴 ISSUE 10: Return null instead of Optional (Code Smell)
+    public String findUser(String name) {
+        if (name.isEmpty()) {
+            return null;
+        }
+        return name;
     }
 
-    // 🔴 ISSUE 12: Duplicate code block
-    public void printUser() {
+    // 🔴 ISSUE 11: Duplicate code / repeated logic
+    public void printUserInfo() {
         System.out.println("User: " + username);
         System.out.println("User: " + username);
         System.out.println("User: " + username);
+    }
+
+    // 🔴 ISSUE 12: Too many System.out instead of logger
+    public void createUser(String name) {
+        System.out.println("Creating user...");
+        this.username = name;
+        System.out.println("User created: " + name);
+    }
+
+    // 🔴 ISSUE 13: Cognitive complexity — deeply nested if blocks
+    public String getUserStatus(String role, boolean active, boolean verified) {
+        if (role != null) {
+            if (active) {
+                if (verified) {
+                    if (role.equals("ADMIN")) {
+                        return "Active Admin";
+                    } else {
+                        return "Active User";
+                    }
+                } else {
+                    return "Unverified";
+                }
+            } else {
+                return "Inactive";
+            }
+        }
+        return "Unknown";
     }
 }
